@@ -78,7 +78,6 @@ print(m_estimated, b_estimated)
 
 
 
-
 # Oct 24
 # y=mx+b
 # configureable number of neurons
