@@ -148,5 +148,3 @@ evaluate_neural_network(
 )
 
 # play around with strategy to reduce learning rate if cost goes up
-# translate and rotate images +/- 15 degrees
-    # imrotate/imtranslat

@@ -1,7 +1,12 @@
 import os
 import struct
 import numpy as np
-import random
+import tkinter as tk
+from tkinter import Canvas
+from PIL import Image, ImageTk, ImageFilter
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 
 # Function to read MNIST images
 def read_idx_images(filename):
@@ -85,6 +90,12 @@ def save_idx(images, labels, filename_images, filename_labels):
 # Function to train the neural network
 def train_neural_network(train_images, train_labels, test_images, test_labels,
                          input_size, hidden_size, output_size, learning_rate, epochs, batch_size):
+
+    # Lists to store accuracy values during training
+    epochs_list = []
+    accuracies_list = []
+
+
     # Initialize parameters
     weights_input_hidden = np.random.randn(input_size, hidden_size)
     biases_hidden = np.zeros((1, hidden_size))
@@ -120,6 +131,9 @@ def train_neural_network(train_images, train_labels, test_images, test_labels,
 
         # Calculate accuracy
         accuracy = total_correct / total_samples
+
+        epochs_list.append(epoch + 1)
+        accuracies_list.append(accuracy)
         print(f"Epoch {epoch + 1}/{epochs}, Training Accuracy: {accuracy:.2%}")
 
     return weights_input_hidden, biases_hidden, weights_hidden_output, biases_output
@@ -161,7 +175,7 @@ output_size = 10  # Number of output classes
 
 # Hyperparameters
 learning_rate = 1
-epochs = 10000
+epochs = 10
 batch_size = 64
 
 # Train the neural network
@@ -179,4 +193,57 @@ evaluate_neural_network(
     weights_input_hidden, biases_hidden, weights_hidden_output, biases_output
 )
 
-# add a gui at the end with a graph where you can go through every image
+class NeuralNetworkGUI:
+    def __init__(self, master, test_images, test_labels, weights_input_hidden, biases_hidden, weights_hidden_output, biases_output):
+        self.master = master
+        self.test_images = test_images
+        self.test_labels = test_labels
+        self.weights_input_hidden = weights_input_hidden
+        self.biases_hidden = biases_hidden
+        self.weights_hidden_output = weights_hidden_output
+        self.biases_output = biases_output
+        self.index = 0
+
+        self.create_widgets()
+
+    def create_widgets(self):
+        self.canvas = Canvas(self.master, width=280, height=280)
+        self.canvas.pack()
+
+        self.label = tk.Label(self.master, text="Prediction: ")
+        self.label.pack()
+
+        self.next_button = tk.Button(self.master, text="Next Image", command=self.show_next_image)
+        self.next_button.pack()
+
+    def show_next_image(self):
+        if self.index < len(self.test_images):
+            image = self.test_images[self.index].reshape((28, 28))
+            self.display_image(image)
+            prediction = self.predict_single_image(self.test_images[self.index])
+            self.label.config(text=f"Prediction: {prediction}")
+            self.index += 1
+
+    def display_image(self, image):
+        self.canvas.delete("all")
+        img = Image.fromarray((image * 255).astype(np.uint8))
+        img = img.resize((280, 280), Image.LANCZOS)
+        photo = ImageTk.PhotoImage(img)
+        self.canvas.create_image(0, 0, anchor=tk.NW, image=photo)
+        self.canvas.image = photo
+
+    def predict_single_image(self, image):
+        hidden_activations, output_activations = forward_pass(
+            image, self.weights_input_hidden, self.biases_hidden, self.weights_hidden_output, self.biases_output
+        )
+        return np.argmax(output_activations)
+
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    root.title("Neural Network GUI")
+
+    gui = NeuralNetworkGUI(root, test_images, test_labels, weights_input_hidden, biases_hidden, weights_hidden_output, biases_output)
+
+    root.mainloop()
