@@ -7,7 +7,6 @@ from PIL import Image, ImageTk, ImageFilter
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-
 # Function to read MNIST images
 def read_idx_images(filename):
     with open(filename, 'rb') as f:
