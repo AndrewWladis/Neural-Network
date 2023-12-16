@@ -239,6 +239,18 @@ class NeuralNetworkGUI:
         return np.argmax(output_activations)
 
 
+# Function to read data in IDX format
+def read_idx(filename_images, filename_labels):
+    images = read_idx_images(filename_images)
+    labels = read_idx_labels(filename_labels)
+    return images, labels
+
+# Function to save data in IDX format
+def save_idx(images, labels, filename_images, filename_labels):
+    save_idx(images, labels, filename_images)
+    save_idx(images, labels, filename_labels)
+
+
 
 if __name__ == "__main__":
     root = tk.Tk()
